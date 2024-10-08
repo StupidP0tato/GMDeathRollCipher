@@ -1,5 +1,6 @@
 from flask import Flask, render_template_string
 import random
+import os
 
 app = Flask(__name__)
 
@@ -33,20 +34,21 @@ def display_matrix():
     <head><title>Random Matrix</title></head>
     <body>
         <h1>Randomized Numbers and Words</h1>
-        <table border="1" cell padding="10">
+        <table border="1" cellpadding="10">
             <tr><th>Number</th><th>Word</th></tr>
             {% for row in matrix %}
             <tr>
                 <td>{{ row[0] }}</td>
                 <td>{{ row[1] }}</td>
             </tr>
-            {% end for %}
+            {% endfor %}
         </table>
     </body>
     </html>
     '''
-
     return render_template_string(html, matrix=matrix)
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    # Get the port number assigned by Render or default to 5000 for local development
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host="0.0.0.0", port=port)
