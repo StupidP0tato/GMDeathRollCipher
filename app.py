@@ -89,7 +89,7 @@ def index():
 def generate_data():
     numbers = generate_randomized_numbers()
     words = read_words_from_file()
-    matrix = [(numbers[i], words[i] if i < len(words) else '') for i in range(20)]
+    matrix = [(words[i] if i < len(words) else '',numbers[i]) for i in range(20)]
 
     return jsonify(matrix)
 
