@@ -1,8 +1,9 @@
-from flask import Flask, render_template_string
+from flask import Flask, render_template_string, jsonify
 import random
 import os
 
 app = Flask(__name__)
+
 
 # Function to read words from the cipher.txt file
 def read_words_from_file():
@@ -13,42 +14,73 @@ def read_words_from_file():
     except FileNotFoundError:
         return ["Error: cipher.txt not found"] * 20
 
+
 # Generate randomized numbers
 def generate_randomized_numbers():
     numbers = list(range(1, 21))  # 1 to 20
     random.shuffle(numbers)
     return numbers
 
-# Route for the main page
+
+# Route for the main page (initially displays an empty table)
 @app.route("/")
-def display_matrix():
-    numbers = generate_randomized_numbers()
-    words = read_words_from_file()
-
-    # Create the 20x2 matrix
-    matrix = [(numbers[i], words[i] if i < len(words) else '') for i in range(20)]
-
-    # Simple HTML table structure
+def index():
     html = '''
     <html>
     <head><title>Random Matrix</title></head>
+    <script>
+        // Function to fetch data and update the table when the button is clicked
+        function fillTable() {
+            fetch("/generate-data")
+            .then(response => response.json())
+            .then(data => {
+                let table = document.getElementById("matrix-table");
+                table.innerHTML = "";  // Clear any existing rows
+
+                // Add table header
+                let header = table.createTHead().insertRow();
+                let th1 = document.createElement("th");
+                let th2 = document.createElement("th");
+                th1.innerHTML = "Number";
+                th2.innerHTML = "Word";
+                header.appendChild(th1);
+                header.appendChild(th2);
+
+                // Add rows for the numbers and words
+                data.forEach(row => {
+                    let newRow = table.insertRow();
+                    let cell1 = newRow.insertCell(0);
+                    let cell2 = newRow.insertCell(1);
+                    cell1.innerHTML = row[0];
+                    cell2.innerHTML = row[1];
+                });
+            });
+        }
+    </script>
+    </head>
     <body>
         <h1>Randomized Numbers and Words</h1>
-        <table border="1" cellpadding="10">
-            <tr><th>Number</th><th>Word</th></tr>
-            {% for row in matrix %}
-            <tr>
-                <td>{{ row[0] }}</td>
-                <td>{{ row[1] }}</td>
-            </tr>
-            {% endfor %}
+        <button onclick="fillTable()">Fill Table</button>
+        <br><br>
+        <table border="1" cellpadding="10" id="matrix-table">
+            <!-- Table starts empty -->
         </table>
     </body>
     </html>
     '''
-    return render_template_string(html, matrix=matrix)
+    return render_template_string(html)
+
+
+# Route to generate the data and send it to the frontend (AJAX)
+@app.route("/generate-data")
+def generate_data():
+    numbers = generate_randomized_numbers()
+    words = read_words_from_file()
+    matrix = [(numbers[i], words[i] if i < len(words) else '') for i in range(20)]
+
+    return jsonify(matrix)
+
 
 if __name__ == "__main__":
-    # Get the port number assigned by Render or default to 5000 for local development
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
