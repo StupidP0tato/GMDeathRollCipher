@@ -27,10 +27,10 @@ def generate_randomized_numbers():
 def index():
     html = '''
     <html>
-    <head><title>Random Matrix</title></head>
+    <head><title>DnD Secret Death Roll</title></head>
     <script>
         // Function to fetch data and update the table when the button is clicked
-        function fillTable() {
+        function GM_Cipher_Table() {
             fetch("/generate-data")
             .then(response => response.json())
             .then(data => {
@@ -56,15 +56,28 @@ def index():
                 });
             });
         }
+
+        // Function to fetch a random entry from cipher.txt
+        function deathRoll() {
+            fetch("/death-roll")
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("death-roll-result").innerText = data.result;
+            });
+        }
     </script>
     </head>
     <body>
         <h1>Randomized Numbers and Words</h1>
-        <button onclick="fillTable()">Fill Table</button>
+        <button onclick="GM_Cipher_Table()">Fill Table</button>
         <br><br>
         <table border="1" cellpadding="10" id="matrix-table">
             <!-- Table starts empty -->
         </table>
+
+        <h2>Death Roll</h2>
+        <button onclick="deathRoll()">Roll</button>
+        <p id="death-roll-result">Result</p>  <!-- This will display the random entry -->
     </body>
     </html>
     '''
@@ -79,6 +92,14 @@ def generate_data():
     matrix = [(numbers[i], words[i] if i < len(words) else '') for i in range(20)]
 
     return jsonify(matrix)
+
+
+# Route to get a random entry from cipher.txt
+@app.route("/death-roll")
+def death_roll():
+    words = read_words_from_file()
+    result = random.choice(words)  # Get a random word
+    return jsonify(result=result)
 
 
 if __name__ == "__main__":
