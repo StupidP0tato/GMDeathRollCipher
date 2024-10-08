@@ -41,8 +41,8 @@ def index():
                 let header = table.createTHead().insertRow();
                 let th1 = document.createElement("th");
                 let th2 = document.createElement("th");
-                th1.innerHTML = "Number";
-                th2.innerHTML = "Word";
+                th1.innerHTML = "Code";
+                th2.innerHTML = "d20";
                 header.appendChild(th1);
                 header.appendChild(th2);
 
@@ -68,17 +68,17 @@ def index():
     </script>
     </head>
     <body>
-        <h1>Randomized Numbers and Words</h1>
-        <button onclick="GM_Cipher_Table()">Fill Table</button>
+        <h1>Death Roll</h1>
+        <button onclick="deathRoll()">Roll</button>
+        <p id="death-roll-result">Result</p>  <!-- This will display the random entry -->
+        </body>
+        
+        <h2>DnD Secret Death Roll</h2>
+        <button onclick="GM_Cipher_Table()">GM Cipher Table</button>
         <br><br>
         <table border="1" cellpadding="10" id="matrix-table">
             <!-- Table starts empty -->
         </table>
-
-        <h2>Death Roll</h2>
-        <button onclick="deathRoll()">Roll</button>
-        <p id="death-roll-result">Result</p>  <!-- This will display the random entry -->
-    </body>
     </html>
     '''
     return render_template_string(html)
